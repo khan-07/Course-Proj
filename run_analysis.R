@@ -1,3 +1,4 @@
+library(plyr)
 ##Read the activity labels file to find the number to name mapping
 num_to_name<-read.table("./UCI HAR Dataset/activity_labels.txt",colClasses="character")
 ##First read the features.txt file 
@@ -18,10 +19,9 @@ std_names<-feature_names[std,2]
 table_subject<-read.table("./UCI HAR Dataset/train/subject_train.txt",colClasses="character")
 ##Now read the activity data
 activity<-read.table("./UCI HAR Dataset/train/y_train.txt",colClasses="character")
+
 ##Replace activity number with the corresponding name of the activity
- for (i in c(1:6)){
-         activity<-replace(activity,activity==i,num_to_name[i,2])
- }
+activity<-num_to_name[activity[,1],2]
 ##Now combine both files in to a single dataframe
 table_subject<-cbind(table_subject,activity)
 ##Now go on to read the feature vector from x_train
@@ -37,9 +37,7 @@ table_subject<-read.table("./UCI HAR Dataset/test/subject_test.txt",colClasses="
 ##Now read the activity data for test dataset
 activity<-read.table("./UCI HAR Dataset/test/y_test.txt",colClasses="character")
 ##Replace activity number with the corresponding name of the activity
-for (i in c(1:6)){
-        activity<-replace(activity,activity==i,num_to_name[i,2])
-}
+activity<-num_to_name[activity[,1],2]
 ##Now bind the two datasets together
 ##Now combine both files in to a single dataframe
 table_subject<-cbind(table_subject,activity)
@@ -53,10 +51,13 @@ feature_test_std<-feature_test[,std]
 table_subject_final1<-cbind(table_subject,feature_test_mean,feature_test_std)
 ##Now bind the train and test dataset together
 Tidy_1<-rbind(table_subject_final,table_subject_final1)
+##Replace - and () with dots. So the variable names are legal 
+names<-gsub("-|\\()",".",c("Subject","Activity",mean_names,std_names))
+##Now remove the dobule dots from the names
+names<-gsub("..",".",names,fixed=T)
 ##Now name each column according to the feature name        
-colnames(Tidy_1)<-c("Subject","Activity",mean_names,std_names)
+colnames(Tidy_1)<-gsub("BodyBody","Body",names)
 ##Now create the second tidy dataset with average of each variable
 Tidy_2<-ddply(Tidy_1,.(Subject,Activity),function(x) colMeans(x[,c(3:68)]))
 Tidy_2<-Tidy_2[order(as.numeric(Tidy_2$Subject)),]
-row.names(Tidy_2)<-NULL
 write.table(Tidy_2,"./UCI HAR Dataset/Tidy2.txt",row.names=F)
