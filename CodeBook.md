@@ -295,6 +295,7 @@ Standard Deviation of Samples of Three dimensional Magnitude Signals for Jerk An
 **Prefix**
 
 t -> Time Domain
+
 f -> Frequency Domain
 
 ###Samples
