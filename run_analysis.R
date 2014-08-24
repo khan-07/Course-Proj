@@ -38,7 +38,6 @@ table_subject<-read.table("./UCI HAR Dataset/test/subject_test.txt",colClasses="
 activity<-read.table("./UCI HAR Dataset/test/y_test.txt",colClasses="character")
 ##Replace activity number with the corresponding name of the activity
 activity<-num_to_name[activity[,1],2]
-##Now bind the two datasets together
 ##Now combine both files in to a single dataframe
 table_subject<-cbind(table_subject,activity)
 ##Now go on to read the feature vector from x_train
@@ -55,9 +54,11 @@ Tidy_1<-rbind(table_subject_final,table_subject_final1)
 names<-gsub("-|\\()",".",c("Subject","Activity",mean_names,std_names))
 ##Now remove the dobule dots from the names
 names<-gsub("..",".",names,fixed=T)
-##Now name each column according to the feature name        
+##Now name each column according to the feature name and remove
+##errors such as "BodyBody"
 colnames(Tidy_1)<-gsub("BodyBody","Body",names)
 ##Now create the second tidy dataset with average of each variable
+##Group the variables with respect to activity and subject
 Tidy_2<-ddply(Tidy_1,.(Subject,Activity),function(x) colMeans(x[,c(3:68)]))
 Tidy_2<-Tidy_2[order(as.numeric(Tidy_2$Subject)),]
 write.table(Tidy_2,"./UCI HAR Dataset/Tidy2.txt",row.names=F)
