@@ -1,9 +1,5 @@
----
-title: "README.md"
-output: html_document
----
 
-#Script
+##Script
 
 Working of the run_analysis.R script is explained.
 
